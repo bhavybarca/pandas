@@ -2132,7 +2132,7 @@ class MultiIndex(Index):
                     raise TypeError('Level type mismatch: %s' % lab)
 
                 # short circuit
-                loc = lev.get_indexer(lab, side=side)
+                loc = lev.searchsorted(lab, side=side)
                 if side == 'right' and loc >= 0:
                     loc -= 1
                 return start + section.searchsorted(loc, side=side)
