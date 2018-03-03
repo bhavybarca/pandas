@@ -241,7 +241,6 @@ class MultiIndex(Index):
         if _set_identity:
             result._reset_identity()
         return result
-
     def _verify_integrity(self, labels=None, levels=None):
         """
 
@@ -2133,17 +2132,17 @@ class MultiIndex(Index):
                     raise TypeError('Level type mismatch: %s' % lab)
 
                 # short circuit
-                loc = lev.searchsorted(lab, side=side)
+                loc = lev.get_indexer(lab, side=side)
                 if side == 'right' and loc >= 0:
                     loc -= 1
-                return start + section.searchsorted(loc, side=side)
+                return start + section.get_indexer(loc, side=side)
 
             idx = lev.get_loc(lab)
             if k < n - 1:
-                end = start + section.searchsorted(idx, side='right')
-                start = start + section.searchsorted(idx, side='left')
+                end = start + section.get_indexer(idx, side='right')
+                start = start + section.get_indexer(idx, side='left')
             else:
-                return start + section.searchsorted(idx, side=side)
+                return start + section.get_indexer(idx, side=side)
 
     def get_loc(self, key, method=None):
         """
@@ -2457,8 +2456,8 @@ class MultiIndex(Index):
                 return convert_indexer(start, stop + 1, step)
             else:
                 # sorted, so can return slice object -> view
-                i = labels.searchsorted(start, side='left')
-                j = labels.searchsorted(stop, side='right')
+                i = labels.get_indexer(start, side='left')
+                j = labels.get_indexer(stop, side='right')
                 return slice(i, j, step)
 
         else:
@@ -2469,8 +2468,8 @@ class MultiIndex(Index):
             elif level > 0 or self.lexsort_depth == 0:
                 return np.array(labels == loc, dtype=bool)
 
-            i = labels.searchsorted(loc, side='left')
-            j = labels.searchsorted(loc, side='right')
+            i = labels.get_indexer(loc, side='left')
+            j = labels.get_indexer(loc, side='right')
             return slice(i, j)
 
     def get_locs(self, seq):
@@ -2866,7 +2865,7 @@ class MultiIndex(Index):
         """
         if self.__bounds is None:
             inds = np.arange(len(self.levels[0]))
-            self.__bounds = self.labels[0].searchsorted(inds)
+            self.__bounds = self.labels[0].get_indexer(inds)
 
         return self.__bounds
 
